@@ -1,17 +1,15 @@
-// src/app/transaction-details/[id]/page.tsx
-import TransactionDetailsContent from "@/components/ui/transaction-details-content"
+import TransactionDetailsContent from "@/components/ui/transaction-details-content";
 
-type Props = {
+interface PageProps {
   params: {
-    id: string;
+    id: string; // Dynamic route parameter
   };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+}
 
-export default function TransactionDetailsPage({ params }: Props) {
+export default function TransactionDetailsPage({ params }: PageProps) {
   // Debug logs for Vercel deployment
-  console.log('Transaction Details Page Rendering');
-  console.log('Transaction ID from params:', params.id);
+  console.log("Transaction Details Page Rendering");
+  console.log("Transaction ID from params:", params.id);
 
   return <TransactionDetailsContent transactionId={params.id} />;
 }
