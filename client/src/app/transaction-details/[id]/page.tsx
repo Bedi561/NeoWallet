@@ -1,12 +1,13 @@
 import TransactionDetailsContent from "@/components/ui/transaction-details-content"
 
-interface PageProps {
-  params: {
-    id: string
-  }
-  searchParams: { [key: string]: string | string[] | undefined }
+type Props = {
+  params: { id: string }
 }
 
-export default function TransactionDetailsPage({ params }: PageProps) {
-  return <TransactionDetailsContent transactionId={params.id} />
+export default async function TransactionDetailsPage(props: Props) {
+  const { id } = props.params
+  return <TransactionDetailsContent transactionId={id} />
 }
+
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
