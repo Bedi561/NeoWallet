@@ -6,10 +6,13 @@ interface PageProps {
   };
 }
 
-export default function TransactionDetailsPage({ params }: PageProps) {
+export default async function TransactionDetailsPage({ params }: PageProps) {
+  // Await the params (as it's now treated as a Promise)
+  const { id } = await params;
+
   // Debug logs for Vercel deployment
   console.log("Transaction Details Page Rendering");
-  console.log("Transaction ID from params:", params.id);
+  console.log("Transaction ID from params:", id);
 
-  return <TransactionDetailsContent transactionId={params.id} />;
+  return <TransactionDetailsContent transactionId={id} />;
 }
