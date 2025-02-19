@@ -1,13 +1,17 @@
+// src/app/transaction-details/[id]/page.tsx
 import TransactionDetailsContent from "@/components/ui/transaction-details-content"
 
 type Props = {
-  params: { id: string }
-}
+  params: {
+    id: string;
+  };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
 
-export default async function TransactionDetailsPage(props: Props) {
-  const { id } = props.params
-  return <TransactionDetailsContent transactionId={id} />
-}
+export default function TransactionDetailsPage({ params }: Props) {
+  // Debug logs for Vercel deployment
+  console.log('Transaction Details Page Rendering');
+  console.log('Transaction ID from params:', params.id);
 
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
+  return <TransactionDetailsContent transactionId={params.id} />;
+}
