@@ -16,12 +16,13 @@ import { Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
+type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
+
 // Refactor Command component
-const Command = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<typeof CommandPrimitive>>
-  (
+const Command = React.forwardRef<HTMLDivElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
-      ref={ref}
+      ref={ref as React.Ref<HTMLDivElement>}
       className={cn(
         "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
         className
@@ -30,7 +31,7 @@ const Command = React.forwardRef<HTMLDivElement, React.ComponentPropsWithoutRef<
     />
   )
 );
-Command.displayName = CommandPrimitive.displayName;
+Command.displayName = "Command";
 
 // Refactor CommandDialog component
 const CommandDialog: React.FC<DialogProps & { children: React.ReactNode }> = ({ children, ...props }) => {
@@ -45,12 +46,14 @@ const CommandDialog: React.FC<DialogProps & { children: React.ReactNode }> = ({ 
   );
 };
 
-// Refactor CommandInput component (local definition)
+// Other components remain unchanged but are strictly typed
+
+// Refactor CommandInput component
 const CommandInput = React.forwardRef<HTMLInputElement, React.ComponentPropsWithoutRef<typeof PrimitiveCommandInput>>(
   ({ className, ...props }, ref) => (
     <div className="flex items-center border-b px-3">
       <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-      <PrimitiveCommandInput // Use the renamed version here
+      <PrimitiveCommandInput
         ref={ref}
         className={cn(
           "flex h-10 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
