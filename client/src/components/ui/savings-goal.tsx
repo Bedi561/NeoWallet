@@ -246,7 +246,7 @@ export default function FinancialLiteracy() {
     <AlertTitle>2025 Tax Glow-Up: New Rules = More Money in Your Pocket!</AlertTitle>
     <AlertDescription className="text-sm">
       Good news! No income tax up to ₹12 lakhs under the new tax regime. 
-      Gen Z tip: This means more money for your investments (or maybe that PS5 you've been eyeing).
+      Gen Z tip: This means more money for your investments (or maybe that PS5 you&apos;ve been eyeing).
     </AlertDescription>
   </Alert>
 
@@ -276,7 +276,7 @@ export default function FinancialLiteracy() {
     <CardContent>
       <div className="space-y-3">
         <div className="p-3 rounded-lg border border-green-100 bg-green-50">
-          <h3 className="font-semibold">1. Index Funds > Stock Picking</h3>
+          <h3 className="font-semibold">1. Index Funds  &gt; Stock Picking</h3>
           <p className="text-sm">Just buy the whole market and chill.</p>
         </div>
         
@@ -295,7 +295,7 @@ export default function FinancialLiteracy() {
         <AlertTitle>Your Simple Money Roadmap</AlertTitle>
         <AlertDescription className="text-sm">
           <ol className="mt-1 space-y-1 ml-5 list-decimal">
-            <li>Emergency fund: 6 months' expenses</li>
+            <li>Emergency fund: 6 months&apos; expenses</li>
             <li>Health insurance: ₹10L + top-up</li>
             <li>Term life insurance (if others depend on you)</li>
             <li>Invest through index funds</li>
@@ -345,7 +345,7 @@ export default function FinancialLiteracy() {
         </div>
         
         <div className="p-3 rounded-lg border">
-          <h3 className="font-semibold">ELSS > Fixed Deposits</h3>
+          <h3 className="font-semibold">ELSS  &gt; Fixed Deposits</h3>
           <p className="text-sm">ELSS funds get tax benefits with only 3-year lock-in and higher returns.</p>
         </div>
         
@@ -449,7 +449,7 @@ export default function FinancialLiteracy() {
                     <AlertCircle className="h-4 w-4" />
                     <AlertTitle>Financial Danger Zone</AlertTitle>
                     <AlertDescription>
-                      You're spending more than you earn. Cut non-essential expenses immediately and consider additional income sources.
+                      You&apos;re spending more than you earn. Cut non-essential expenses immediately and consider additional income sources.
                     </AlertDescription>
                   </Alert>
                 )}
