@@ -14,7 +14,8 @@ export default function SignupPage() {
         // Redirect to Home or show the HomeContent if authenticated
         <div>Redirecting...</div> // Placeholder until you handle redirection
       ) : (
-        <AuthForm type="signup" onLoginSuccess={handleSignupSuccess} />
+<AuthForm defaultTab="signup" onLoginSuccess={handleSignupSuccess} />
+
       )}
     </div>
   );
