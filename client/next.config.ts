@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactStrictMode: false,
+  reactRoot: 'concurrent', // Helps with debugging hydration issues
+  reactStrictMode: true,
+ 
 };
 
 export default nextConfig;

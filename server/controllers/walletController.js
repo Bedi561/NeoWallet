@@ -111,21 +111,25 @@ export const updateBalance = async (walletId, amount, type) => {
 
 // Get all transactions of a wallet
 export const getTransactions = async (req, res) => {
-    const { walletId } = req.params;
-  
-    try {
-      const transactions = await prisma.transaction.findMany({
-        where: { walletId },
-        orderBy: { createdAt: 'desc' },
-      });
-  
-      res.status(200).json(transactions);
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Something went wrong while fetching transactions.' });
-    }
-  };
+  console.log("GET /transactions/:walletId endpoint hit");
+  console.log("Request params:", req.params);
+  const { walletId } = req.params;
+  console.log("Extracted walletId:", walletId);
 
+  try {
+    console.log("Attempting to fetch transactions from database for walletId:", walletId);
+    const transactions = await prisma.transaction.findMany({
+      where: { walletId },
+      orderBy: { createdAt: 'desc' },
+    });
+    
+    console.log(`Found ${transactions.length} transactions`);
+    res.status(200).json(transactions);
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({ message: 'Something went wrong while fetching transactions.' });
+  }
+};
 
 export const addmoney = async (req, res) => {
   const { amount } = req.body;

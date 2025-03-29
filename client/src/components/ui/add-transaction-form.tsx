@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
 import { useState, useEffect } from "react"
@@ -6,23 +5,24 @@ import { useRouter, useSearchParams } from "next/navigation"
 import axios from "@/lib/axios"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import { ArrowLeftRight, Tag } from "lucide-react"
+import { ArrowLeftRight, ArrowLeft, DollarSign, User, Tag } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default function AddTransactionForm() {
-    const [recipient, setRecipient] = useState("");
+    const [recipient, setRecipient] = useState("")
     const [amount, setAmount] = useState("")
     const [category, setCategory] = useState("")
     const [type, setType] = useState("send")
     const [walletId, setWalletId] = useState("")
-    const [error, setError] = useState("")
-    const [alertInfo, setAlertInfo] = useState<{
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [notification, setNotification] = useState<{
         title: string
         description: string
-        variant: "default" | "destructive"
+        type: "error" | "success" | null
     } | null>(null)
 
     const router = useRouter()
@@ -32,132 +32,217 @@ export default function AddTransactionForm() {
         const walletIdParam = searchParams.get("walletId")
         if (walletIdParam) {
             setWalletId(walletIdParam)
-            console.log(`Wallet ID set from URL: ${walletIdParam}`)  // Log walletId
+            console.log(`Wallet ID set from URL: ${walletIdParam}`)
         }
     }, [searchParams])
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setNotification(null)
+        setIsSubmitting(true)
 
         if (!category) {
-            setError("Please select a category")
-            console.log("Error: No category selected")  // Log error if category is missing
+            setNotification({
+                title: "Missing Information",
+                description: "Please select a transaction category",
+                type: "error"
+            })
+            setIsSubmitting(false)
             return
         }
 
-        console.log("Submitting transaction:", { walletId, type, amount, category, recipient }) // Log data before submission
+        const amountNum = Number.parseFloat(amount)
+        if (isNaN(amountNum) || amountNum <= 0) {
+            setNotification({
+                title: "Invalid Amount",
+                description: "Please enter a valid positive amount",
+                type: "error"
+            })
+            setIsSubmitting(false)
+            return
+        }
+
+        console.log("Submitting transaction:", { walletId, type, amount, category, recipient })
 
         try {
             const response = await axios.post("/transaction/transactionDone", {
                 walletId,
                 type,
-                amount: Number.parseFloat(amount),
+                amount: amountNum,
                 category,
                 recipient: type === "send" ? recipient : null,
             })
-            console.log("Transaction successful:", response.data) // Log successful response
+            
+            console.log("Transaction successful:", response.data)
             const transactionId = response.data.transaction.id
-            setAlertInfo({
-                title: "Success",
-                description: "Transaction added successfully!",
-                variant: "default",
+            
+            setNotification({
+                title: "Transaction Complete",
+                description: type === "send" ? "Money sent successfully!" : "Money received successfully!",
+                type: "success"
             })
+            
             setTimeout(() => router.push(`/transaction-history?walletId=${walletId}&transactionId=${transactionId}`), 2000)
         } catch (err) {
-            console.error("Transaction error:", err)  // Log error details
-            setAlertInfo({
-                title: "Error",
-                description: "Failed to add transaction. Please try again.",
-                variant: "destructive",
+            console.error("Transaction error:", err)
+            setNotification({
+                title: "Transaction Failed",
+                description: "We couldn't process your transaction. Please try again.",
+                type: "error"
             })
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
+    const categoryIcons = {
+        savings: "💰",
+        food: "🍲",
+        salary: "💼",
+        other: "📋"
+    }
+
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100">
-            <Card className="w-full max-w-md">
-                <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                        <ArrowLeftRight className="h-6 w-6" />
-                        Add Transaction
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+            <Card className="w-full max-w-md shadow-lg">
+                <CardHeader className="pb-4">
+                    <CardTitle className="flex items-center gap-2 text-xl font-medium">
+                        <ArrowLeftRight className="h-5 w-5 text-primary" />
+                        {type === "send" ? "Send Money" : "Record Incoming Money"}
                     </CardTitle>
                 </CardHeader>
+                
                 <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Transaction Type Selector */}
+                        <div className="grid grid-cols-2 gap-2 mb-2">
+                            <Button
+                                type="button"
+                                variant={type === "send" ? "default" : "outline"}
+                                className={cn("h-10", type === "send" && "font-medium")}
+                                onClick={() => setType("send")}
+                            >
+                                Send Money
+                            </Button>
+                            <Button
+                                type="button"
+                                variant={type === "receive" ? "default" : "outline"}
+                                className={cn("h-10", type === "receive" && "font-medium")}
+                                onClick={() => setType("receive")}
+                            >
+                                Receive Money
+                            </Button>
+                        </div>
+                        
+                        {/* Recipient Field (for Send only) */}
                         {type === "send" && (
                             <div className="space-y-2">
-                                <Label htmlFor="recipient">Recipient (Email/Username)</Label>
-                                <Input
-                                    id="recipient"
-                                    placeholder="Enter recipient's email or username"
-                                    value={recipient}
-                                    onChange={(e) => setRecipient(e.target.value)}
-                                    required
-                                />
+                                <Label htmlFor="recipient" className="text-sm font-medium">
+                                    Recipient
+                                </Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                    <Input
+                                        id="recipient"
+                                        placeholder="Email or username"
+                                        value={recipient}
+                                        onChange={(e) => setRecipient(e.target.value)}
+                                        className="pl-9"
+                                        required
+                                        disabled={isSubmitting}
+                                    />
+                                </div>
                             </div>
                         )}
+                        
+                        {/* Amount Field */}
                         <div className="space-y-2">
-                            <Label htmlFor="amount">Amount</Label>
-                            <Input
-                                id="amount"
-                                type="number"
-                                placeholder="Amount"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                required
-                            />
+                            <Label htmlFor="amount" className="text-sm font-medium">
+                                Amount
+                            </Label>
+                            <div className="relative">
+                                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
+                                <Input
+                                    id="amount"
+                                    type="number"
+                                    placeholder="0.00"
+                                    value={amount}
+                                    onChange={(e) => setAmount(e.target.value)}
+                                    className={cn(
+                                        "pl-9 text-lg h-12",
+                                        notification?.type === "error" && "border-red-300 focus-visible:ring-red-400"
+                                    )}
+                                    required
+                                    min="0.01"
+                                    step="0.01"
+                                    disabled={isSubmitting}
+                                />
+                            </div>
                         </div>
 
-                        {/* Category Selection Section */}
+                        {/* Category Selection */}
                         <div className="space-y-2">
-                            <Label htmlFor="category">Category</Label>
-                            <Select value={category} onValueChange={setCategory}>
-                                <SelectTrigger>
+                            <Label htmlFor="category" className="text-sm font-medium">
+                                Category
+                            </Label>
+                            <Select value={category} onValueChange={setCategory} disabled={isSubmitting}>
+                                <SelectTrigger className="h-12" id="category">
                                     <SelectValue placeholder="Select a category" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="savings">Savings</SelectItem>
-                                    <SelectItem value="food">Food</SelectItem>
-                                    <SelectItem value="salary">Salary</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
+                                    <SelectItem value="savings">💰 Savings</SelectItem>
+                                    <SelectItem value="food">🍲 Food</SelectItem>
+                                    <SelectItem value="salary">💼 Salary</SelectItem>
+                                    <SelectItem value="other">📋 Other</SelectItem>
                                 </SelectContent>
                             </Select>
                         </div>
 
-                        {/* Show error if category is not selected */}
-                        {error && (
-                            <Alert variant="destructive">
-                                <AlertDescription>{error}</AlertDescription>
+                        {/* Notification Alert */}
+                        {notification && (
+                            <Alert 
+                                variant={notification.type === "error" ? "destructive" : "default"}
+                                className={cn(
+                                    "border",
+                                    notification.type === "success" && "border-green-200 bg-green-50 text-green-800"
+                                )}
+                            >
+                                <AlertTitle>{notification.title}</AlertTitle>
+                                <AlertDescription>{notification.description}</AlertDescription>
                             </Alert>
                         )}
-
-                        <div className="space-y-2">
-                            <Label htmlFor="type">Type</Label>
-                            <Select value={type} onValueChange={setType}>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select transaction type" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="send">Send</SelectItem>
-                                    <SelectItem value="receive">Receive</SelectItem>
-                                </SelectContent>
-                            </Select>
-                        </div>
-
-                        <Button type="submit" className="w-full">
-                            Submit Transaction
-                        </Button>
-                        <Button variant="outline" className="w-full" onClick={() => router.push("/home")}>
-                            Back to Home
-                        </Button>
                     </form>
                 </CardContent>
+                
+                <CardFooter className="flex flex-col gap-3 pt-2">
+                    <Button 
+                        type="submit" 
+                        className="w-full h-11"
+                        disabled={isSubmitting || !amount || (type === "send" && !recipient)}
+                        onClick={handleSubmit}
+                    >
+                        {isSubmitting ? "Processing..." : type === "send" ? "Send Money" : "Record Transaction"}
+                    </Button>
+                    
+                    <Button 
+                        variant="ghost" 
+                        className="w-full text-gray-500 flex items-center justify-center gap-2" 
+                        onClick={() => router.push("/home")}
+                        disabled={isSubmitting}
+                    >
+                        <ArrowLeft className="h-4 w-4" />
+                        Back to Home
+                    </Button>
+                </CardFooter>
             </Card>
 
-            {alertInfo && (
-                <Alert variant={alertInfo.variant} className="fixed bottom-4 right-4 max-w-md">
-                    <AlertTitle>{alertInfo.title}</AlertTitle>
-                    <AlertDescription>{alertInfo.description}</AlertDescription>
+            {/* Auto-dismiss notification for successful transactions */}
+            {notification?.type === "success" && (
+                <Alert 
+                    className="fixed bottom-4 right-4 max-w-md border-green-200 bg-green-50 text-green-800 shadow-lg animate-in slide-in-from-right"
+                >
+                    <AlertTitle>{notification.title}</AlertTitle>
+                    <AlertDescription>{notification.description}</AlertDescription>
                 </Alert>
             )}
         </div>
