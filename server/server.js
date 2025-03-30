@@ -16,11 +16,16 @@ const app = express();
 
 
 app.use(express.json()); 
+// app.use(cors({
+//   origin: '*',
+//   credentials: true
+// }));
 app.use(cors({
-  origin: '*',
-  credentials: true
-}));
-
+  origin: ["https://neo-wallet-alpha.vercel.app"],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}))
 
 app.use('/api/users', userRoutes); 
 app.use('/api/walletStuff', walletRoutes);

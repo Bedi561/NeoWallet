@@ -5,6 +5,10 @@ const instance = axios.create({
   // baseURL: process.env.NEXT_PUBLIC_API_URL || "https://neowallet.onrender.com/api",
   // baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api",
   baseURL: process.env.NEXT_PUBLIC_API_URL || "https://neowallet.onrender.com/api",
+  withCredentials: true, // ✅ Must match backend CORS settings
+  headers: {
+    "Content-Type": "application/json",
+  },
 })
 
 instance.interceptors.request.use(
